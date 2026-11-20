@@ -4,6 +4,8 @@ Let two monic polynomials with nonnegative real coefficients have a product whos
 
 AI generated the proof, the manuscript, and the Lean formalization.
 
+The Fourier-series proof (v2 below) appears in the [Hexagon preprint `hexagon:2611.00674v2`](https://hexagonmath.org/2611.00674v2).
+
 | Version | Manuscript | Lean proof |
 | --- | --- | --- |
 | v2 · Fourier series | [PDF](paper/v2.pdf) · [LaTeX](paper/v2.tex) | [Reading guide](lean/v2/README.md) · [Polynomial theorem](lean/v2/Trinomial/Trinomial.lean) · [Probabilistic formulation](lean/v2/Trinomial/Probability.lean) |
