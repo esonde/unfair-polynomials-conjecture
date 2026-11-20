@@ -1,6 +1,6 @@
 # Lean certificate for nonnegative trinomial factors
 
-The certificate formalizes [the coefficient proof](../paper/trinomials-coefficients.tex) using Lean 4.19.0 and mathlib. The library entry point is `import Uniform`.
+The certificate formalizes [the v1 coefficient proof](../../paper/v1.tex) using Lean 4.19.0 and mathlib. The library entry point is `import Uniform`.
 
 ## Build and check
 
