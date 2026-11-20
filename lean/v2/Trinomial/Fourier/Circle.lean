@@ -1,7 +1,11 @@
-import Trinomial.Fourier.ConstantTerm
-import Mathlib.Algebra.Polynomial.Roots
-import Mathlib.Analysis.Fourier.AddCircle
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
+module
+
+public import Trinomial.Fourier.ConstantTerm
+public import Mathlib.Algebra.Polynomial.Roots
+public import Mathlib.Analysis.Fourier.AddCircle
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
+
+@[expose] public section
 
 /-! # Angular Fourier coefficients on the circle with period 2π -/
 
@@ -28,8 +32,7 @@ theorem wave_coe (θ : ℝ) : fourier 1 (θ : Angle) = Complex.exp ((θ:ℂ) * C
   rw [fourier_coe_apply]
   congr 1
   push_cast
-  field_simp [Real.pi_ne_zero]
-  ring
+  field_simp [Real.pi_ne_zero] <;> ring
 
 theorem b_coe (θ : ℝ) : b (θ : Angle) = 2 * Real.cos θ := by
   rw [b,wave_coe,Complex.exp_ofReal_mul_I_re]
@@ -87,7 +90,8 @@ theorem coeff_b_mul {f : Angle → ℂ} (hf : Continuous f) (d : ℤ) :
     fourierCoeff (fun t => (b t : ℂ) * f t) d =
       fourierCoeff f (d-1) + fourierCoeff f (d+1) := by
   simp_rw [b_char,add_mul]
-  rw [coeff_add ((fourier 1).continuous.mul hf) ((fourier (-1)).continuous.mul hf),coeff_shift,coeff_shift]
+  rw [coeff_add (f := fun t => fourier 1 t * f t) (g := fun t => fourier (-1) t * f t)
+    ((fourier 1).continuous.mul hf) ((fourier (-1)).continuous.mul hf), coeff_shift, coeff_shift]
   simp
 
 theorem coeff_const (c : ℂ) (d : ℤ) :
@@ -100,7 +104,7 @@ theorem coeff_const (c : ℂ) (d : ℤ) :
 
 /-- For polynomials this Fourier coefficient is the coefficient of the finite Laurent expansion. -/
 theorem coeff_eval (p : ℝ[X]) (d : ℤ) :
-    fourierCoeff (fun t : Angle => Complex.ofReal (p.eval (b t))) d = (walk p d : ℂ) := by
+    fourierCoeff (fun t : Angle => Complex.ofReal (p.eval (b t))) d = ((walk p).coeff d : ℂ) := by
   induction p using Polynomial.induction_on generalizing d with
   | C c =>
     simp only [eval_C,walk_C,LaurentPolynomial.C_apply,coeff_const]
@@ -114,7 +118,7 @@ theorem coeff_eval (p : ℝ[X]) (d : ℤ) :
     let q := C c * X^n
     rw [pow_succ,← mul_assoc]
     change fourierCoeff (fun t : Angle => Complex.ofReal ((q*X).eval (b t))) d = _
-    change _ = ((walk (q*X)) d : ℂ)
+    change _ = ((walk (q*X)).coeff d : ℂ)
     rw [map_mul,walk_X]
     simp only [eval_mul,eval_X,Complex.ofReal_mul]
     rw [mul_comm (walk q) J,shift]

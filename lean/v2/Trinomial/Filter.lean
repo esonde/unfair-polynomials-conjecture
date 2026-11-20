@@ -1,5 +1,9 @@
-import Trinomial.Recurrence
-import Mathlib.Analysis.Complex.Basic
+module
+
+public import Trinomial.Recurrence
+public import Mathlib.Analysis.Complex.Basic
+
+@[expose] public section
 
 /-! # The polynomial filter and the coefficient bound of Section 3 -/
 

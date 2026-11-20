@@ -1,5 +1,9 @@
-import Uniform.Recurrence
-import Mathlib.Analysis.Complex.Basic
+module
+
+public import Uniform.Recurrence
+public import Mathlib.Analysis.Complex.Basic
+
+@[expose] public section
 
 /-! # The polynomial filter and the statement of Proposition 4.1 -/
 

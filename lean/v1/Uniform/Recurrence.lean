@@ -1,4 +1,8 @@
-import Uniform.Polynomial
+module
+
+public import Uniform.Polynomial
+
+@[expose] public section
 
 /-! # The coefficient recurrence at integer indices -/
 

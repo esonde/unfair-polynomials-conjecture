@@ -1,5 +1,9 @@
-import Uniform.Walks.Branches
-import Uniform.Walks.Geometric
+module
+
+public import Uniform.Walks.Branches
+public import Uniform.Walks.Geometric
+
+@[expose] public section
 
 /-! # Pointwise energy of the two geometric branches (Appendix A.3) -/
 
@@ -44,13 +48,13 @@ private theorem outer_square {R u : ℝ} (j : ℕ) (hu : u ≠ 0) :
     raw R (.ofNat j) u ^2 = (u^2-R^2)^4/u^2*(R^2/u^2)^j := by
   have commutePow (b : ℝ) : (b^j)^2 = (b^2)^j := by rw [← pow_mul, mul_comm j 2, pow_mul]
   simp only [raw,base,ratioTerm,pow_succ u j,mul_pow,div_pow,commutePow,neg_sq]
-  field_simp; ring
+  field_simp <;> ring
 
 private theorem inner_square {R u : ℝ} (j : ℕ) (hR : 0 < R) :
     raw R (.negSucc j) u ^2 = (u^2-R^2)^4/R^2*(u^2/R^2)^j := by
   have commutePow (b : ℝ) : (b^j)^2 = (b^2)^j := by rw [← pow_mul, mul_comm j 2, pow_mul]
   simp only [raw,base,ratioTerm,pow_succ R j,mul_pow,div_pow,commutePow,neg_sq]
-  field_simp; ring
+  field_simp <;> ring
 
 private theorem outer_log {R u : ℝ} (j : ℕ) (hu : u ≠ 0) (hd : u^2-R^2 ≠ 0) :
     rawD R (.ofNat j) u = raw R (.ofNat j) u*(4*u/(u^2-R^2)-(j+1)/u) := by
@@ -61,10 +65,10 @@ private theorem outer_log {R u : ℝ} (j : ℕ) (hu : u ≠ 0) (hd : u^2-R^2 ≠
 private theorem inner_log {R u : ℝ} (j : ℕ) (hu : u ≠ 0) (hd : u^2-R^2 ≠ 0) (hR : 0 < R) :
     rawD R (.negSucc j) u = raw R (.negSucc j) u*(4*u/(u^2-R^2)+j/u) := by
   cases j with
-  | zero => simp [raw,rawD,base,ratioTerm,slopeTerm]; field_simp; ring
+  | zero => simp [raw,rawD,base,ratioTerm,slopeTerm]; field_simp <;> ring
   | succ j =>
     simp only [raw,rawD,base,ratioTerm,slopeTerm,Nat.add_sub_cancel,Nat.cast_succ,pow_succ (-u)]
-    field_simp; ring
+    field_simp <;> ring
 
 /-- At the origin only the value in column -1 and the derivative in column -2 contribute. -/
 private theorem density_zero {R : ℝ} (hR : 0 < R) :
@@ -104,7 +108,7 @@ theorem density_sum {R u : ℝ} (hR : 0 < R) (hu : u ≠ 0) (hd : u^2 ≠ R^2) :
     simp only [localEnergy,branch,dbranch,ellAt,g,dg,cut,height,sub_pos,if_neg hi.asymm,if_pos hi,
       mul_zero,add_zero,zero_mul,zero_pow (by decide : 2 ≠ 0),zero_add]
     rw [inner_log j hu (sub_ne_zero.mpr hd) hR]
-    have he : -2*u+w u*(4*u/(h-x)+j/u) = A+B*ell j := by dsimp [A,B,ell]; field_simp; ring
+    have he : -2*u+w u*(4*u/(h-x)+j/u) = A+B*ell j := by dsimp [A,B,ell]; field_simp <;> ring
     symm
     change _ = ell j*((ell j^2+9)*(w u*raw R (.negSucc j) u)^2+
       w u*((-2*u)*raw R (.negSucc j) u+w u*(raw R (.negSucc j) u*(4*u/(h-x)+j/u)))^2)
@@ -120,7 +124,7 @@ theorem density_sum {R u : ℝ} (hR : 0 < R) (hu : u ≠ 0) (hd : u^2 ≠ R^2) :
     simp only [localEnergy,branch,dbranch,ellAt,g,dg,cut,height,sub_pos,if_neg ho.asymm,if_pos ho,
       mul_zero,add_zero,zero_mul,zero_pow (by decide : 2 ≠ 0)]
     rw [outer_log j hu (sub_ne_zero.mpr hd)]
-    have he : -2*u+w u*(4*u/(h-x)-(j+1)/u) = A+B*ell j := by dsimp [A,B,ell]; field_simp; ring
+    have he : -2*u+w u*(4*u/(h-x)-(j+1)/u) = A+B*ell j := by dsimp [A,B,ell]; field_simp <;> ring
     symm
     change _ = ell j*((ell j^2+9)*(w u*raw R (.ofNat j) u)^2+
       w u*((-2*u)*raw R (.ofNat j) u+w u*(raw R (.ofNat j) u*(4*u/(h-x)-(j+1)/u)))^2)
@@ -141,24 +145,28 @@ private def signAt : ℤ → ℝ
 
 private theorem reflected_branch (R : ℝ) (s : ℤ) (u : ℝ) :
     branch R s (-u) = signAt s * branch R s u := by
-  cases s with
-  | ofNat j =>
-    simp only [branch,g,cut,height,neg_sq,signAt]
-    split_ifs
-    · simp only [raw,base,ratioTerm,neg_sq,w]
-      rw [show (-u)^(j+1) = (-1)^(j+1)*u^(j+1) by rw [← mul_pow,neg_one_mul],div_mul_eq_div_div]
-      have h : ((-1:ℝ)^(j+1))⁻¹ = (-1:ℝ)^(j+1) := by rw [← inv_pow]; norm_num
-      simp only [div_eq_mul_inv,h]; ring
-    · ring
-  | negSucc j =>
-    simp only [branch,g,cut,height,neg_sq,signAt]
-    split_ifs
-    · simp only [raw,base,ratioTerm,neg_sq,w]
-      rw [show (-u)^j = (-1)^j*u^j by rw [← mul_pow,neg_one_mul]]
-      rw [neg_neg]
-      have hs : ((-1:ℝ)^j)^2 = 1 := by rw [sq,← mul_pow]; norm_num
-      linear_combination -((4-u^2) * (u^2-R^2)^2 * u^j/R^(j+1)) * hs
-    · ring
+  have height_even : height R s (-u) = height R s u := by
+    cases s <;> simp [height]
+  have w_even : w (-u) = w u := by simp [w]
+  unfold branch g cut
+  rw [height_even, w_even]
+  by_cases h : 0 < height R s u
+  · rw [if_pos h, if_pos h]
+    cases s with
+    | ofNat j =>
+      simp only [raw, base, ratioTerm, neg_sq, signAt]
+      rw [neg_pow u (j+1), div_mul_eq_div_div]
+      have inv_sign : ((-1 : ℝ)^(j+1))⁻¹ = (-1)^(j+1) := by
+        rw [← inv_pow]
+        norm_num
+      simp only [div_eq_mul_inv, inv_sign]
+      ring
+    | negSucc j =>
+      simp only [raw, base, ratioTerm, neg_sq, neg_neg, signAt]
+      rw [neg_pow]
+      have hs : ((-1 : ℝ)^j)^2 = 1 := by rw [sq, ← mul_pow]; norm_num
+      linear_combination -(w u * (u^2-R^2)^2 * u^j/R^(j+1)) * hs
+  · simp [h]
 
 theorem complementary (R : ℝ) (hR : 0 < R) (j : ℕ) (d : ℤ) :
     kernel R hR d (.ofNat j) = 0 ∨ kernel R hR d (.negSucc j) = 0 := by

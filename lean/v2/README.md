@@ -9,9 +9,12 @@ From this directory, with Elan installed, run
 ```sh
 lake exe cache get
 lake build
+lake comparator --config comparator.json
 ```
 
-The toolchain and mathlib are pinned to v4.19.0. The package has its own Lake configuration and manifest. All project imports start with `Trinomial`. The algebraic modules adapt proofs shared with the first manuscript. The analytic proof uses mathlib's Fourier coefficients on the additive circle and the product of its normalized Haar measures.
+[Challenge.lean](Challenge.lean) states the two results independently. [Solution.lean](Solution.lean) proves them using this development. [formalization.yaml](formalization.yaml) records their provenance.
+
+The toolchain and mathlib are pinned to v4.35.0-rc2. The package has its own Lake configuration and manifest. All project imports start with `Trinomial`. The algebraic modules adapt proofs shared with the first manuscript. The analytic proof uses mathlib's Fourier coefficients on the additive circle and the product of its normalized Haar measures.
 
 To inspect the statements and their transitive axioms, run
 

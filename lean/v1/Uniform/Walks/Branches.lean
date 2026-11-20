@@ -1,5 +1,9 @@
-import Uniform.Walks.Differentiable
-import Mathlib.Analysis.Calculus.ContDiff.Basic
+module
+
+public import Uniform.Walks.Differentiable
+public import Mathlib.Analysis.Calculus.ContDiff.Basic
+
+@[expose] public section
 
 /-! # The two decaying branches of the scalar recurrence (Appendix A.2) -/
 
@@ -69,22 +73,21 @@ private theorem cut_deriv {h f : ℝ → ℝ} (hc : Continuous h)
 theorem raw_hasDerivAt (R : ℝ) (hR : 0 < R) (s : ℤ) {u : ℝ} (hu : 0 ≤ height R s u) :
     HasDerivAt (raw R s) (rawD R s u) u := by
   have hb : HasDerivAt (base R) (4*u*(u^2-R^2)) u := by
-    convert (((hasDerivAt_id u).pow 2).sub_const (R^2)).pow 2 using 1
-    simp [base]
-    ring
+    convert (((hasDerivAt_id u).fun_pow 2).sub_const (R^2)).fun_pow 2 using 1
+    · rfl
+    · simp only [id_eq, Nat.cast_ofNat, Nat.reduceSub, pow_one, mul_one]
+      ring
   apply hb.mul
   cases s with
   | ofNat j =>
     have un : u ≠ 0 := by rintro rfl; simp [height] at hu; nlinarith [sq_pos_of_pos hR]
     change HasDerivAt (fun x => (-R)^j/x^(j+1)) _ u
-    convert (hasDerivAt_const u ((-R)^j)).div ((hasDerivAt_id u).pow (j+1)) (pow_ne_zero _ un) using 1
-    simp only [slopeTerm,Nat.cast_succ,Nat.add_sub_cancel,id_eq,mul_one,zero_mul,zero_sub]
-    field_simp [pow_succ, un]
-    ring
+    convert (hasDerivAt_const u ((-R)^j)).fun_div ((hasDerivAt_id u).fun_pow (j+1)) (pow_ne_zero _ un) using 1
+    all_goals first | rfl | (simp only [slopeTerm,Nat.cast_succ,Nat.add_sub_cancel,id_eq,mul_one,zero_mul,zero_sub] <;> field_simp [pow_succ, un] <;> ring)
   | negSucc j =>
     change HasDerivAt (fun x => (-x)^j/R^(j+1)) _ u
-    convert (((hasDerivAt_id u).neg.pow j).div_const (R^(j+1))) using 1
-    simp [slopeTerm]
+    convert (((hasDerivAt_id u).neg.fun_pow j).div_const (R^(j+1))) using 1
+    all_goals first | rfl | (simp [slopeTerm] <;> ring)
 
 private theorem height_eq (R : ℝ) (s : ℤ) {u : ℝ} (hu : height R s u = 0) : u^2-R^2 = 0 := by
   cases s <;> simp [height] at hu <;> linarith
@@ -125,7 +128,8 @@ theorem dg_cont (R : ℝ) (hR : 0 < R) (s : ℤ) : Continuous (dg R s) := by
 theorem branch_hasDerivAt (R : ℝ) (hR : 0 < R) (s : ℤ) (u : ℝ) :
     HasDerivAt (branch R s) (dbranch R s u) u := by
   have hw : HasDerivAt w (-2*u) u := by
-    simpa [w] using (hasDerivAt_const u (4:ℝ)).sub ((hasDerivAt_id u).pow 2)
+    convert (hasDerivAt_const u (4:ℝ)).sub ((hasDerivAt_id u).fun_pow 2) using 1
+    all_goals first | rfl | simp
   exact hw.mul (g_hasDerivAt R hR s u)
 
 theorem branch_cont (R : ℝ) (hR : 0 < R) (s : ℤ) : Continuous (branch R s) :=
@@ -173,12 +177,15 @@ theorem scalar (R : ℝ) (hR : 0 < R) (s : ℤ) (u : ℝ) :
 
 theorem kernel_equation (R : ℝ) (hR : 0 < R) (d s : ℤ) :
     kernel R hR (d-1) s + kernel R hR (d+1) s + R*kernel R hR d (s-1) =
-      if s=0 then walk (numerator R) d else 0 := by
+      if s=0 then (walk (numerator R)).coeff d else 0 := by
   have h : restrict X*column R hR s + restrict (C R)*column R hR (s-1) =
       if s=0 then restrict (numerator R) else 0 := by
     ext u
     have he := scalar R hR s u
-    split_ifs at he ⊢ <;> simpa [column,onI,restrict_apply,numerator,w,base] using he
+    simp only [ContinuousMap.add_apply, ContinuousMap.mul_apply, restrict_apply, eval_X, eval_C]
+    change (u : ℝ) * branch R s u + R * branch R (s-1) u =
+      (if s = 0 then restrict (numerator R) else 0) u
+    split_ifs at he ⊢ <;> simpa [restrict_apply,numerator,w,base] using he
   have hf := congrArg (fun f => b f d) h
   simp only [b_add,continuous_shift,b_const_mul] at hf
   unfold kernel

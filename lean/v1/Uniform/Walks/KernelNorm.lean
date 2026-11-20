@@ -1,5 +1,9 @@
-import Uniform.Walks.Energy
-import Mathlib.Data.Real.Pi.Bounds
+module
+
+public import Uniform.Walks.Energy
+public import Mathlib.Analysis.Real.Pi.Bounds
+
+@[expose] public section
 
 /-! # Absolute summability and the strict kernel norm bound -/
 

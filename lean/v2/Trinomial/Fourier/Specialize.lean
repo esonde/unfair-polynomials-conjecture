@@ -1,6 +1,10 @@
-import Trinomial.Fourier.Branches
-import Trinomial.Filter
-import Mathlib.LinearAlgebra.Finsupp.LSum
+module
+
+public import Trinomial.Fourier.Branches
+public import Trinomial.Filter
+public import Mathlib.LinearAlgebra.Finsupp.LSum
+
+@[expose] public section
 
 /-! # Substituting the doubled angular variable into the polynomial filter -/
 
@@ -17,12 +21,13 @@ def doubled (P : ℂ[X]) (n : ℤ) : ℂ := if n % 2 = 0 then coeffZ P (n/2) els
   simp [doubled]
 
 /-- Pair a finitely supported Laurent polynomial with a complex sequence. -/
-private def test (f : ℤ → ℂ) : Laurent →ₗ[ℝ] ℂ :=
-  Finsupp.lsum ℝ (fun d => LinearMap.toSpanSingleton ℝ ℂ (f d))
+def test (f : ℤ → ℂ) : Laurent →ₗ[ℝ] ℂ :=
+  (Finsupp.lsum ℝ (fun d => LinearMap.toSpanSingleton ℝ ℂ (f d))).comp
+    (AddMonoidAlgebra.coeffLinearEquiv (R := ℝ)).toLinearMap
 
 theorem test_tsum (p : Laurent) (f : ℤ → ℂ) :
-    ∑' d, (p d : ℂ)*f d = test f p := by
-  rw [tsum_eq_sum (s := p.support) (fun d hd => by rw [Finsupp.not_mem_support_iff.mp hd]; simp)]
+    ∑' d, (p.coeff d : ℂ)*f d = test f p := by
+  rw [tsum_eq_sum (s := p.coeff.support) (fun d hd => by rw [Finsupp.notMem_support_iff.mp hd]; simp)]
   rfl
 
 private theorem test_power (f : ℤ → ℂ) (n : ℕ) :
@@ -34,15 +39,15 @@ private theorem test_power (f : ℤ → ℂ) (n : ℕ) :
   change test f (T _ * LaurentPolynomial.C (n.choose i : ℝ)) = _
   rw [mul_comm,← LaurentPolynomial.single_eq_C_mul_T]
   dsimp only [test]
-  change (Finsupp.single _ (n.choose i : ℝ)).sum (fun d c => (c:ℂ)*f d) = _
-  rw [Finsupp.sum_single_index (by simp)]
+  change (AddMonoidAlgebra.single _ (n.choose i : ℝ)).coeff.sum (fun d c => (c:ℂ)*f d) = _
+  rw [AddMonoidAlgebra.coeff_single, Finsupp.sum_single_index (by simp)]
   push_cast
   congr 2
   ring
 
 /-- The constant-term test against the numerator is the negative of the seven-term mask. -/
 theorem numerator_test (R : ℝ) (m : ℕ) (N : ℤ) (P : ℂ[X]) :
-    ∑' d, ((walk (numerator R) d : ℝ) : ℂ) * doubled P (2*N-6*m-m*d) =
+    ∑' d, (((walk (numerator R)).coeff d : ℝ) : ℂ) * doubled P (2*N-6*m-m*d) =
       -coeffZ (mask (R^2-1) (X^m)*P) N := by
   let f (d : ℤ) := doubled P (2*N-6*m-m*d)
   let x := R^2

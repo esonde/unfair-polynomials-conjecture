@@ -13,13 +13,20 @@ The Fourier-series proof (v2 below) appears in the [Hexagon preprint `hexagon:26
 
 ## Check the Lean proof
 
-With Elan installed, run the following from the repository root for v2. For v1, use `cd lean/v1` in the first step. Both projects pin Lean and mathlib to v4.19.0.
+With Elan and bubblewrap installed, run the following from the repository root for v2. For v1, use `cd lean/v1` in the first step. Both projects pin Lean and mathlib to v4.35.0-rc2.
 
 ```sh
 cd lean/v2
 lake exe cache get
 lake build
+lake comparator --config comparator.json
 ```
+
+## Palomar
+
+Both projects expose the same polynomial and probabilistic statements to Comparator.
+For the [Palomar submission](https://submit.palomar-registry.org/), select the public
+commit and set the project path to `lean/v2`. The v2 project contains the Fourier proof.
 
 ## Rebuild the paper
 

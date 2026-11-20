@@ -1,6 +1,10 @@
-import Trinomial.Fourier.Circle
-import Trinomial.Fourier.Profiles
-import Mathlib.MeasureTheory.Integral.DominatedConvergence
+module
+
+public import Trinomial.Fourier.Circle
+public import Trinomial.Fourier.Profiles
+public import Mathlib.MeasureTheory.Integral.DominatedConvergence
+
+@[expose] public section
 
 /-! # Integration by parts and summation of the three column moments -/
 
@@ -26,7 +30,7 @@ private theorem velocity_deriv (t : ℝ) :
   simp only [velocity_coe,b_coe]
   convert (Real.hasDerivAt_sin t).const_mul (-2) using 1; ring
 
-private def corrected (R : ℝ) (s : ℤ) (u : ℝ) :=
+def corrected (R : ℝ) (s : ℤ) (u : ℝ) :=
   let h := u^2
   let W := w u
   ellAt s * ((W^2*(ellAt s^2+16)+2*W*(W-h))*g R s u^2 + W^3*dg R s u^2)
@@ -59,8 +63,9 @@ theorem column_integration_by_parts (R : ℝ) (hp : 0 < R) (s : ℤ) :
     have dw' := ((db.const_mul (-2)).mul dv)
     have dg := (g_hasDerivAt R hp s _).comp t db
     convert (((dw.mul dw').mul (dg.pow 2)).const_mul (ellAt s)) using 1
+    all_goals first | rfl | skip
     dsimp [D,localEnergy,corrected,branch,dbranch,w]
-    simp only [Nat.cast_ofNat,Nat.reduceSub,pow_one]
+    try simp only [Nat.cast_ofNat,Nat.reduceSub,pow_one]
     linear_combination (ellAt s * (4 * (b (t : Angle))^2 * g R s (b t)^2 -
       4 * b t * (4 - (b t)^2) * g R s (b t) * Trinomial.Fourier.dg R s (b t) -
       2 * (4 - (b t)^2) * g R s (b t)^2)) * (velocity_sq (t : Angle)).symm

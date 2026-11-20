@@ -1,5 +1,10 @@
-import Trinomial.Normalization
-import Mathlib.NumberTheory.NumberField.Embeddings
+module
+
+public import Trinomial.Normalization
+public import Mathlib.NumberTheory.NumberField.InfinitePlace.Embeddings
+public import Mathlib.NumberTheory.NumberField.Norm
+
+@[expose] public section
 
 /-! # A conjugate in the annulus (Section 2) -/
 
@@ -23,7 +28,7 @@ theorem exists_large_embedding {K : Type*} [Field K] [NumberField K] (x : K)
     exact_mod_cast Int.one_le_abs (Algebra.norm_ne_zero_iff.mpr hz)
   have hprod : (∏ σ : K →ₐ[ℚ] ℂ, ‖σ x‖) < 1 := by
     calc
-      _ < ∏ _ : K →ₐ[ℚ] ℂ, (1 : ℝ) := Finset.prod_lt_prod
+      _ < ∏ _ : K →ₐ[ℚ] ℂ, (1 : ℝ) := Finset.prod_lt_prod₀
         (fun σ _ => norm_pos_iff.mpr ((_root_.map_ne_zero σ).mpr hne))
         (fun σ _ => h σ) ⟨ι, Finset.mem_univ _, hi⟩
       _ = 1 := by simp
@@ -121,7 +126,7 @@ theorem conjugate_annulus (c : FractionalCase) :
   letI : FiniteDimensional ℚ c.field := IntermediateField.adjoin.finiteDimensional c.integral.tower_top
   letI : NumberField c.field := {}
   let ι := (Complex.ofRealHom.comp f).toRatAlgHom
-  have hgen : IsIntegral ℤ c.gen := (isIntegral_algebraMap_iff f.injective).mp c.integral
+  have hgen : IsIntegral ℤ c.gen := isIntegral_algebraMap_iff.mp c.integral
   have hne : c.gen ≠ 0 := fun e => c.a_pos.ne' (by rw [← hfa, e, map_zero])
   have hi : ‖ι c.gen‖ < 1 := by
     change ‖(c.a : ℂ)‖ < 1

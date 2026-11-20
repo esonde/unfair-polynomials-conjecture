@@ -1,7 +1,11 @@
-import Mathlib.Analysis.Complex.Basic
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.Positivity
-import Mathlib.Tactic.Ring
+module
+
+public import Mathlib.Analysis.Complex.Basic
+public import Mathlib.Tactic.Linarith
+public import Mathlib.Tactic.Positivity
+public import Mathlib.Tactic.Ring
+
+@[expose] public section
 
 /-! # The contradiction at a widest strip (Section 5)
 The bounds on the filtered differences are written after multiplication by the positive

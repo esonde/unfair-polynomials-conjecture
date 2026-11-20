@@ -1,5 +1,9 @@
-import Trinomial.Comparison
-import Trinomial.Fourier.Convolution
+module
+
+public import Trinomial.Comparison
+public import Trinomial.Fourier.Convolution
+
+@[expose] public section
 
 /-! # Nonnegative trinomial factors of binary polynomials -/
 

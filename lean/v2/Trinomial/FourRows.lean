@@ -1,4 +1,8 @@
-import Trinomial.Strips
+module
+
+public import Trinomial.Strips
+
+@[expose] public section
 
 /-! # The forced four rows of a strip (Section 1) -/
 
@@ -132,7 +136,7 @@ theorem middle_lt_half (c : FractionalCase) : c.a < 1/2 := by
   have hi := c.integral
   rw [half] at hi
   have hq : IsIntegral ℤ (1/2 : ℚ) :=
-    (isIntegral_algebraMap_iff (algebraMap ℚ ℝ).injective).mp (by simpa using hi)
+    (isIntegral_algebraMap_iff (R := ℤ) (A := ℚ) (B := ℝ)).mp (by simpa using hi)
   obtain ⟨z,hz⟩ := IsIntegrallyClosed.isIntegral_iff.mp hq
   change (z : ℚ) = 1/2 at hz
   have eq : (2:ℤ)*z = 1 := by exact_mod_cast (show (2:ℚ)*z=1 by linarith)

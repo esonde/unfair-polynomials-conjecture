@@ -1,5 +1,9 @@
-import Uniform.Walks.KernelNorm
-import Uniform.Walks.Specialize
+module
+
+public import Uniform.Walks.KernelNorm
+public import Uniform.Walks.Specialize
+
+@[expose] public section
 
 /-! # Pairing the kernel equation with product coefficients -/
 
@@ -12,7 +16,7 @@ private theorem transfer (R : ℝ) (hR : 1 ≤ R) (V : ℤ × ℤ → ℂ)
     (bound : ℝ) (hb : ∀ z, ‖V z‖ ≤ bound) :
     let k (p : ℤ × ℤ) := (kernel R (lt_of_lt_of_le zero_lt_one hR) p.1 p.2 : ℂ)
     ∑' p, k p * (V (p+(1,0)) + V (p+(-1,0)) + (R:ℂ)*V (p+(0,1))) =
-      ∑' d, (walk (numerator R) d : ℂ)*V (d,0) := by
+      ∑' d, ((walk (numerator R)).coeff d : ℂ)*V (d,0) := by
   let hp := lt_of_lt_of_le zero_lt_one hR
   let k (p : ℤ × ℤ) := (kernel R hp p.1 p.2 : ℂ)
   let A (v p : ℤ × ℤ) := k (p-v)*V p
@@ -20,7 +24,7 @@ private theorem transfer (R : ℝ) (hR : 1 ≤ R) (V : ℤ × ℤ → ℂ)
   have kn : Summable (fun p : ℤ × ℤ => ‖k p‖) := by
     simpa [k,Real.norm_eq_abs] using (kernel_norm R hR).1
   have sb (v : ℤ × ℤ) : Summable (B v) :=
-    (kn.mul_right bound).of_norm_bounded _ (fun p => by
+    (kn.mul_right bound).of_norm_bounded (fun p => by
       simpa [B,norm_mul] using mul_le_mul_of_nonneg_left (hb (p+v)) (norm_nonneg (k p)))
   have ident (v p : ℤ × ℤ) : A v ((Equiv.addRight v) p) = B v p := by simp [A,B]
   have sa (v : ℤ × ℤ) : Summable (A v) := by
@@ -28,7 +32,7 @@ private theorem transfer (R : ℝ) (hR : 1 ≤ R) (V : ℤ × ℤ → ℂ)
     simpa only [Function.comp_def,ident] using sb v
   have reindex (v : ℤ × ℤ) : ∑' p, B v p = ∑' p, A v p := by
     simpa only [ident] using (Equiv.addRight v).tsum_eq (A v)
-  let rhs (p : ℤ × ℤ) := if p.2 = 0 then (walk (numerator R) p.1 : ℂ)*V p else 0
+  let rhs (p : ℤ × ℤ) := if p.2 = 0 then ((walk (numerator R)).coeff p.1 : ℂ)*V p else 0
   have equation (p : ℤ × ℤ) : A (1,0) p + A (-1,0) p + (R:ℂ)*A (0,1) p = rhs p := by
     obtain ⟨d,s⟩ := p
     have he := congrArg Complex.ofReal (kernel_equation R hp d s)

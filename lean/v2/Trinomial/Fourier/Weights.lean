@@ -1,7 +1,11 @@
-import Trinomial.Fourier.Geometric
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.ArctanDeriv
-import Mathlib.Analysis.Calculus.Deriv.MeanValue
-import Mathlib.Data.Int.Interval
+module
+
+public import Trinomial.Fourier.Geometric
+public import Mathlib.Analysis.SpecialFunctions.Trigonometric.ArctanDeriv
+public import Mathlib.Analysis.Calculus.Deriv.MeanValue
+public import Mathlib.Data.Int.Interval
+
+@[expose] public section
 
 /-! # The reciprocal-weight sum (Section 3)
 The tangent line to the reciprocal gives the cell-average Jensen inequality.
@@ -25,21 +29,30 @@ private theorem cell (b d : ℝ) (hb : 0 < b) :
   let F (y : ℝ) := (2/D-b^2/D^2)*y-y^3/(3*D^2)
   let A (y : ℝ) := arctan (y/b)/b
   have dA (y : ℝ) : HasDerivAt A (1/(b^2+y^2)) y := by
-    have ne : 1+(y/b)^2 ≠ 0 := by positivity
+    have eq : (1+(y/b)^2)*b*b = b^2+y^2 := by
+      rw [div_pow]
+      field_simp [hb.ne'] <;> ring
     convert ((hasDerivAt_arctan (y/b)).comp y ((hasDerivAt_id y).div_const b)).div_const b using 1
-    dsimp; field_simp; ring
+    · funext z
+      simp [A, div_eq_mul_inv]
+    · change 1/(b^2+y^2) = 1/(1+(y/b)^2)*(1/b)/b
+      rw [div_mul_div_comm, one_mul, div_div, eq]
   have dF (y : ℝ) : HasDerivAt F (2/D-(b^2+y^2)/D^2) y := by
     convert ((hasDerivAt_id y).const_mul (2/D-b^2/D^2)).sub
       (((hasDerivAt_id y).pow 3).div_const (3*D^2)) using 1
-    dsimp; field_simp; ring
+    · funext z
+      change (2/D-b^2/D^2)*z-z^3/(3*D^2) = _
+      dsimp [id]
+    · simp only [id_eq, Nat.cast_ofNat, Nat.reduceSub, mul_one]
+      field_simp [hD.ne'] <;> ring
   have mono : Monotone (fun y => A y - F y) := by
     apply monotone_of_deriv_nonneg (fun y => ((dA y).sub (dF y)).differentiableAt)
     intro y
     rw [((dA y).sub (dF y)).deriv]
     have hpos : 0 < b^2+y^2 := by positivity
     field_simp
-    apply div_nonneg _ (by positivity)
-    nlinarith [mul_nonneg hD.le (sq_nonneg (D-(b^2+y^2)))]
+    simpa only [zero_mul] using (show 0 ≤ D^2 - (b^2+y^2)*(2*D-(b^2+y^2)) by
+      nlinarith only [sq_nonneg (D-(b^2+y^2))])
   have he : F (d+1/2)-F (d-1/2) = 1/D := by
     dsimp [F]
     field_simp
@@ -132,7 +145,6 @@ theorem reciprocal_bound (n : ℕ) (s : Finset ℤ) :
         unfold ell; push_cast
         rw [div_eq_mul_inv]; apply mul_le_mul_of_nonneg_left _ pi_pos.le
         field_simp
-        apply (div_le_div_iff₀ (by positivity) (by positivity)).mpr
         nlinarith [Nat.cast_nonneg (α := ℝ) i]
   have ts := sum_le_sum (fun i (_ : i ∈ range n) => tail i)
   rw [← mul_sum] at ts

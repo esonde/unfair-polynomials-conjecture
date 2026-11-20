@@ -1,6 +1,10 @@
-import Trinomial.Fourier.KernelNorm
-import Trinomial.Fourier.Series
-import Trinomial.Fourier.Specialize
+module
+
+public import Trinomial.Fourier.KernelNorm
+public import Trinomial.Fourier.Series
+public import Trinomial.Fourier.Specialize
+
+@[expose] public section
 
 /-! # Proposition 4 in the original two torus variables -/
 
@@ -52,7 +56,7 @@ private theorem doubled_one (n : ℤ) : doubled (1 : ℂ[X]) n = if n=0 then 1 e
   split_ifs <;> first | rfl | omega
 
 private theorem mask_mode (R : ℝ) (p : ℤ) :
-    -(walk (numerator R) (2*p-6) : ℂ) = coeffZ (mask (R^2-1) X) p := by
+    -((walk (numerator R)).coeff (2*p-6) : ℂ) = coeffZ (mask (R^2-1) X) p := by
   have h := numerator_test R 1 p 1
   simp only [Nat.cast_one,mul_one,one_mul,pow_one,doubled_one] at h
   rw [tsum_eq_single (2*p-6) (fun d hd => by rw [if_neg (by omega),mul_zero])] at h
@@ -65,7 +69,7 @@ theorem coefficient_equation (lam : ℂ) (hp : 0 < ‖lam‖) (i : Lattice) :
     a i + a (i-(1,0)) + lam*a (i-(0,1)) = polynomialArray (mask (‖lam‖^2-1) X) i := by
   obtain ⟨p,s⟩ := i
   let d := 2*p+s-6
-  have rec := kernel_equation ‖lam‖ hp d s
+  have recurrence := kernel_equation ‖lam‖ hp d s
   let η := phase lam
   have hn : η ≠ 0 := by intro eq; have h := phase_norm hp; change ‖η‖ = 1 at h; simp [eq] at h
   have phase_step : lam*η^(s-1) = (‖lam‖:ℂ)*η^s := by
@@ -81,13 +85,13 @@ theorem coefficient_equation (lam : ℂ) (hp : 0 < ‖lam‖) (i : Lattice) :
   simp only [← mul_assoc,mul_neg,phase_step]
   by_cases hs : s=0
   · subst s
-    simp only [zpow_zero,neg_one_mul,if_true] at rec ⊢
+    simp only [zpow_zero,neg_one_mul,if_true] at recurrence ⊢
     have maskEq := mask_mode ‖lam‖ p
-    rw [show d = 2*p-6 by dsimp [d]; ring] at rec ⊢
-    rw [← maskEq,← rec]
+    rw [show d = 2*p-6 by dsimp [d]; ring] at recurrence ⊢
+    rw [← maskEq,← recurrence]
     ring
-  · rw [if_neg hs] at rec ⊢
-    linear_combination -(η^s)*rec
+  · rw [if_neg hs] at recurrence ⊢
+    linear_combination -(η^s)*recurrence
 
 def axis (n : ℕ) : Lattice := ((n:ℤ),0)
 
@@ -146,7 +150,6 @@ private theorem synthesis_mul (lam : ℂ) (hR : 1 ≤ ‖lam‖) (t : Torus) :
     intro i; simp [Function.comp_def,norm_mul]
   have s0 : Summable (fun i => a i * character i t) := by simpa using summ 0
   have eq := congrArg (fun f => synthesis f t) (funext (coefficient_equation lam hp))
-  dsimp only at eq
   rw [synthesis_polynomial] at eq
   unfold synthesis at eq
   simp only [add_mul,mul_assoc] at eq
@@ -188,6 +191,7 @@ theorem synthesis_eq_quotient (lam : ℂ) (hR : 1 ≤ ‖lam‖) :
       exact (mul_eq_zero.mp prod).resolve_left nz
     have he := closure_minimal (t := {φ | synthesis a (t.1,φ) = 0}) vanishes
       (isClosed_eq hc' continuous_const) (dense_compl_singleton t.2 t.2)
+    change synthesis a t = 0 at he
     simpa only [quotient,h,div_zero] using he
   · apply (eq_div_iff h).mpr
     rw [mul_comm]

@@ -1,7 +1,11 @@
-import Trinomial.Fourier.Circle
-import Trinomial.Fourier.Profiles
-import Mathlib.Analysis.Complex.RealDeriv
-import Mathlib.Algebra.Field.Power
+module
+
+public import Trinomial.Fourier.Circle
+public import Trinomial.Fourier.Profiles
+public import Mathlib.Analysis.Complex.RealDeriv
+public import Mathlib.Algebra.Field.Power
+
+@[expose] public section
 
 /-! # The angular profiles, their Fourier recurrence, parity and derivative estimate -/
 
@@ -26,14 +30,13 @@ def kernel (R : ℝ) (hp : 0 < R) (d s : ℤ) : ℂ := fourierCoeff (column R hp
 
 theorem kernel_equation (R : ℝ) (hp : 0 < R) (d s : ℤ) :
     kernel R hp (d-1) s + kernel R hp (d+1) s + R*kernel R hp d (s-1) =
-      if s=0 then (walk (numerator R) d : ℂ) else 0 := by
+      if s=0 then ((walk (numerator R)).coeff d : ℂ) else 0 := by
   have point (θ : Angle) :
       (b θ : ℂ)*column R hp s θ + R*column R hp (s-1) θ =
         if s=0 then Complex.ofReal ((numerator R).eval (b θ)) else 0 := by
     have he := congrArg Complex.ofReal (scalar R hp s (b θ))
     split_ifs at he ⊢ <;> simpa [column,numerator,w,base] using he
   have eq := congrArg (fun f : Angle → ℂ => fourierCoeff f d) (funext point)
-  dsimp only at eq
   rw [coeff_add (f := fun θ => (b θ : ℂ)*column R hp s θ)
     (g := fun θ => (R:ℂ)*column R hp (s-1) θ) ((Complex.continuous_ofReal.comp b_cont).mul (column R hp s).continuous)
     (continuous_const.mul (column R hp (s-1)).continuous),coeff_b_mul (column R hp s).continuous,
@@ -63,7 +66,7 @@ theorem kernel_row_frequency (R : ℝ) (hp : 0 < R) (d s : ℤ) (hne : kernel R 
     rw [fourier_coe_apply,← Complex.exp_pi_mul_I,← Complex.exp_int_mul]
     congr 1
     push_cast
-    field_simp [Real.pi_ne_zero]; ring
+    field_simp [Real.pi_ne_zero] <;> ring
   have sg : (signAt s : ℂ) = (-1:ℂ)^(s+1) := by
     cases s with
     | ofNat j => simp [signAt,pow_succ,zpow_add₀]
@@ -121,7 +124,6 @@ theorem weighted_mode (R : ℝ) (hp : 0 < R) (s d : ℤ) :
     (fun t _ => column_deriv R hp s t)
     ((g.continuous.comp (AddCircle.continuous_mk' period)).intervalIntegrable 0 period)
   rw [coeff_interval f,coeff_interval g] at h
-  dsimp only at h
   rw [AddCircle.coe_period] at h
   simp only [AddCircle.coe_zero,sub_self,mul_zero,sub_zero,zero_sub] at h
   have hn : (d:ℂ) ≠ 0 := by exact_mod_cast hd

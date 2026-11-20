@@ -1,7 +1,11 @@
-import Trinomial.Fourier.Circle
-import Mathlib.MeasureTheory.Integral.Prod
-import Mathlib.MeasureTheory.Integral.DominatedConvergence
-import Mathlib.Analysis.NormedSpace.FunctionSeries
+module
+
+public import Trinomial.Fourier.Circle
+public import Mathlib.MeasureTheory.Integral.Prod
+public import Mathlib.MeasureTheory.Integral.DominatedConvergence
+public import Mathlib.Analysis.NormedSpace.FunctionSeries
+
+@[expose] public section
 
 /-! # Absolutely convergent Fourier series on the product of two circles -/
 

@@ -1,4 +1,8 @@
-import Trinomial.Recurrence
+module
+
+public import Trinomial.Recurrence
+
+@[expose] public section
 
 /-! # Reduction to a fractional coefficient and oriented exponents -/
 
@@ -102,7 +106,7 @@ theorem theorem_of_no_fractional_case (exclude : FractionalCase → False) : Tri
     have hD₀ : D.coeff 0 = 1 := by simpa [hD 0, trailingCoeff] using tb
     have hmD : D.Monic := by
       have key := congrArg leadingCoeff shB
-      simpa only [leadingCoeff_mul, leadingCoeff_X_pow, mul_one, hmb.leadingCoeff] using key.symm
+      simpa only [Monic, leadingCoeff_mul, leadingCoeff_X_pow, mul_one, hmb.leadingCoeff] using key.symm
     have hprod : A*B = (tri (j-k) (n-k) a * D) * X^(k+B.natTrailingDegree) := by
       conv_lhs => rw [shiftA, shB]
       rw [pow_add]; ring

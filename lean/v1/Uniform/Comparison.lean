@@ -1,5 +1,9 @@
-import Uniform.Differences
-import Uniform.Filter
+module
+
+public import Uniform.Differences
+public import Uniform.Filter
+
+@[expose] public section
 
 /-! # Filtered differences along a strip and the final comparison -/
 

@@ -1,7 +1,11 @@
-import Uniform.Walks.Positivity
-import Uniform.Walks.Moments
-import Mathlib.Topology.ContinuousMap.Weierstrass
-import Mathlib.Analysis.InnerProductSpace.l2Space
+module
+
+public import Uniform.Walks.Positivity
+public import Uniform.Walks.Moments
+public import Mathlib.Topology.ContinuousMap.Weierstrass
+public import Mathlib.Analysis.InnerProductSpace.l2Space
+
+@[expose] public section
 
 /-! # Continuous extension of the walk coefficients -/
 
@@ -24,20 +28,20 @@ theorem dense_restrict : DenseRange restrict := by
   apply Metric.mem_closure_iff.mpr
   intro ε hε
   obtain ⟨p,hp⟩ := exists_polynomial_near_continuousMap (-2) 2 f ε hε
-  exact ⟨_,⟨p,rfl⟩,by simpa [dist_comm f,dist_eq_norm] using hp⟩
+  exact ⟨_,⟨p,rfl⟩,by simpa [restrict,dist_comm f,dist_eq_norm] using hp⟩
 
-private def vector (a : Laurent) : L2 :=
-  ⟨(fun d => a d),(memℓp_zero a.finite_support).of_exponent_ge (zero_le _)⟩
+def vector (a : Laurent) : L2 :=
+  ⟨(fun d => a.coeff d), (memℓp_zero a.coeff.hasFiniteSupport).of_exponent_ge zero_le⟩
 
 theorem norm_sq (a : L2) : ‖a‖^2 = ∑' d, (a d)^2 := by
   simpa [Real.norm_eq_abs] using lp.norm_rpow_eq_tsum (p := 2) (by norm_num) a
 
-private def vectors (p : ℝ[X]) : L2 × L2 := (vector (walk p), vector (H*walk p))
+def vectors (p : ℝ[X]) : L2 × L2 := (vector (walk p), vector (H*walk p))
 
 private theorem vectors_sub (p q : ℝ[X]) : vectors (p-q) = vectors p - vectors q := by
   apply Prod.ext <;> apply Subtype.ext <;> funext d
-  · exact congrArg (fun a : Laurent => a d) (map_sub walk p q)
-  · change (H*walk (p-q)) d = ((H*walk p)-(H*walk q)) d
+  · exact congrArg (fun a : Laurent => a.coeff d) (map_sub walk p q)
+  · change (H*walk (p-q)).coeff d = ((H*walk p)-(H*walk q)).coeff d
     rw [map_sub,mul_sub]
 
 @[simp] theorem moment_C (a : ℝ) : moment (C a) = a := by simp [moment]
@@ -65,11 +69,12 @@ private theorem vectors_dist (p q : ℝ[X]) :
     dist (vectors p) (vectors q) ≤ 2 * dist (restrict p) (restrict q) := by
   simpa only [dist_eq_norm, vectors_sub, map_sub] using vectors_bound (p-q)
 
-private def onRange (f : Set.range restrict) := vectors f.property.choose
+def onRange (f : Set.range restrict) := vectors f.property.choose
 
 private theorem range_lipschitz : LipschitzWith 2 onRange := by
   apply LipschitzWith.of_dist_le_mul
   intro f g
+  change dist (onRange f) (onRange g) ≤ (2 : ℝ) * dist (f : Functions) (g : Functions)
   simpa only [onRange, f.property.choose_spec, g.property.choose_spec] using
     vectors_dist f.property.choose g.property.choose
 
@@ -90,10 +95,10 @@ def b (f : Functions) (d : ℤ) : ℝ := (coefficients f).1 d
 def diff (f : Functions) (d : ℤ) : ℝ := (coefficients f).2 d
 def L (f : Functions) : ℝ := b f 0
 
-@[simp] theorem b_restrict (p : ℝ[X]) (d : ℤ) : b (restrict p) d = walk p d := by
+@[simp] theorem b_restrict (p : ℝ[X]) (d : ℤ) : b (restrict p) d = (walk p).coeff d := by
   rw [b,coefficients_restrict]; rfl
 
-@[simp] theorem diff_restrict (p : ℝ[X]) (d : ℤ) : diff (restrict p) d = (H*walk p) d := by
+@[simp] theorem diff_restrict (p : ℝ[X]) (d : ℤ) : diff (restrict p) d = (H*walk p).coeff d := by
   rw [diff,coefficients_restrict]; rfl
 
 @[simp] theorem L_restrict (p : ℝ[X]) : L (restrict p) = moment p := b_restrict p 0
@@ -134,7 +139,7 @@ theorem b_const_mul (a : ℝ) (f : Functions) (d : ℤ) :
     b (restrict (C a)*f) d = a*b f d := by
   refine dense_restrict.induction_on f (isClosed_eq (by fun_prop) (by fun_prop)) (fun p => ?_)
   rw [← map_mul,b_restrict,b_restrict,map_mul,walk_C,← LaurentPolynomial.single_eq_C,
-    AddMonoidAlgebra.single_zero_mul_apply]
+    AddMonoidAlgebra.coeff_single_zero_mul]
 
 theorem L_nonneg (f : Functions) (h : ∀ u, 0 ≤ f u) : 0 ≤ L f := by
   let g : Functions := ⟨fun u => Real.sqrt (f u),Real.continuous_sqrt.comp f.continuous⟩

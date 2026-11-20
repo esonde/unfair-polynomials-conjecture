@@ -1,6 +1,10 @@
-import Uniform.Walks.Continuous
-import Mathlib.Analysis.Calculus.Deriv.Polynomial
-import Mathlib.Analysis.Calculus.MeanValue
+module
+
+public import Uniform.Walks.Continuous
+public import Mathlib.Analysis.Calculus.Deriv.Polynomial
+public import Mathlib.Analysis.Calculus.MeanValue
+
+@[expose] public section
 
 /-! # Simultaneous approximation of a function and its derivative -/
 
@@ -10,6 +14,10 @@ namespace Uniform.Walks
 open Polynomial Set
 
 def onI (f : ℝ → ℝ) (h : ContinuousOn f I) : Functions := ⟨fun u => f u, h.restrict⟩
+
+@[simp] theorem onI_apply (f : ℝ → ℝ) (h : ContinuousOn f I) (u : I) :
+    onI f h u = f u := rfl
+
 
 private theorem primitive (q : ℝ[X]) : ∃ p : ℝ[X], p.derivative = q := by
   induction q using Polynomial.induction_on' with
@@ -41,7 +49,6 @@ private theorem dense_derivatives (f g : ℝ → ℝ) (hf : ContinuousOn f I) (h
     apply (ContinuousMap.norm_le _ (by positivity)).mpr
     intro x
     have h := est x x.property
-    dsimp only at h
     rw [val,sub_self,sub_zero] at h
     exact h.trans (mul_le_mul_of_nonneg_left (by linarith [x.property.2]) epos.le)
   refine ⟨_, ⟨P,rfl⟩, ?_⟩
@@ -69,7 +76,9 @@ theorem differentiable_energy (f g : ℝ → ℝ) (hf : ContinuousOn f I) (hg : 
 
 def negI : C(I,I) :=
   ⟨fun x => ⟨-(x:ℝ), by constructor <;> linarith [x.property.1,x.property.2]⟩,
-    continuous_subtype_val.neg.subtype_mk (fun x => by constructor <;> linarith [x.property.1,x.property.2])⟩
+    continuous_subtype_val.neg.subtype_mk (fun x => by
+      change -(x : ℝ) ∈ I
+      constructor <;> linarith [x.property.1, x.property.2])⟩
 
 theorem b_reflect (f : Functions) (d : ℤ) : b (f.comp negI) d = (-1:ℝ)^d*b f d := by
   refine dense_restrict.induction_on f ?_ ?_

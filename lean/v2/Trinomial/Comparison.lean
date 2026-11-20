@@ -1,5 +1,9 @@
-import Trinomial.Differences
-import Trinomial.Filter
+module
+
+public import Trinomial.Differences
+public import Trinomial.Filter
+
+@[expose] public section
 
 /-! # Filtered differences along a strip and the final comparison -/
 

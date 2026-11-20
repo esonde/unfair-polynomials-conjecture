@@ -1,5 +1,9 @@
-import Uniform.Embedded
-import Uniform.WidestStrip
+module
+
+public import Uniform.Embedded
+public import Uniform.WidestStrip
+
+@[expose] public section
 
 /-! # Successive differences in the first four rows (Sections 3 and 4) -/
 
@@ -80,8 +84,8 @@ theorem delta_initial (E : Embedded c) (S : c.Strip) :
     field_simp [E.ne_zero]
   · linear_combination a
   · linear_combination b
-  · linear_combination E.lam * d
-  · linear_combination E.lam * e
+  · linear_combination d
+  · linear_combination e
 
 theorem delta_step (E : Embedded c) (S : c.Strip) {k : ℕ} (hk : k+2 ≤ S.width) :
     (E.delta S (k+1)).step = Four.scale (-E.lam) (E.delta S k) := by

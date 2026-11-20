@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: v0.4
+project:
+  name: The Unfair 0–1 Polynomial Conjecture for Trinomial Factors
+  description: If a product of two monic real polynomials with nonnegative coefficients is
+    binary and one factor has exactly three nonzero coefficients, both factors are binary.
+    Two independent finitely supported integer laws are each uniform on their support when
+    their sum is uniform on its support and one law has exactly three support points. This
+    formalization uses polynomial approximation.
+  authors:
+  - Alessandro Baravelli
+  license: Apache-2.0
+  responsible_maintainers:
+  - Alessandro Baravelli
+classification:
+  arxiv:
+  - math.CO
+  msc2020:
+  - 11C08
+  - 11B83
+sources:
+- title: The Unfair 0–1 Polynomial Conjecture for Trinomial Factors
+  type: preprint
+  contributors:
+  - name: Alessandro Baravelli
+    role: Hexagon submitter
+  id: hexagon:2611.00674v1
+  location: https://hexagonmath.org/2611.00674v1
+  relationship: formalizes
+  license: CC-BY-4.0
+status:
+  scope: The polynomial theorem for arbitrary exponents and cofactor degree, and the probabilistic
+    formulation on an arbitrary probability space.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms:
+  - propext
+  - Classical.choice
+  - Quot.sound
+automation:
+  methods:
+  - method: agent
+    models: []
+    framework: Codex
+    tool_setup: Lean and mathlib with AI-generated proof development and an agent-assisted
+      Palomar migration.
+    prompting_notes: Alessandro Baravelli directed the development and selected the proof versions.
+      Codex prepared the independent statements and ported the proofs.
+  notes: The proof, manuscript, and original Lean formalization were AI-generated under human
+    direction. Historical model identifiers and costs were not recorded in this repository.
+fidelity:
+  divergences: Lean bounds the widest strip using blocks of equal width and computes the kernel
+    energy on each geometric branch. The reading guide describes these choices.
+review:
+  status: agent-reviewed
+  reviewers:
+  - Codex
+  notes: Codex compared the formal statements with the polynomial and probabilistic formulations
+    in the manuscript.
+alignment:
+  namespace: UnfairTrinomial
+  statements:
+  - source: Theorem 1.1
+    lean: UnfairTrinomial.trinomial_factor
+    module: Solution
+    status: proved
+    note: The trinomial is the first factor. Commutativity also permits it to be the second.
+  - source: Equivalent probabilistic formulation
+    lean: UnfairTrinomial.uniform_of_independent_random_variables
+    module: Solution
+    status: proved
+    note: Support is the set of integer points of positive mass. Either variable can have three
+      support points.
+acknowledgements: Lean and mathlib provide the proof language, libraries and tactics.

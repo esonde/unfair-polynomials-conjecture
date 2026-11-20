@@ -1,4 +1,8 @@
-import Trinomial.FourRows
+module
+
+public import Trinomial.FourRows
+
+@[expose] public section
 
 /-! # Transport of strips to one complex embedding -/
 
@@ -74,8 +78,9 @@ theorem row (E : Embedded c) {S : c.Strip} {j : ℤ} {k : ℕ} (hd : S.d j (k+1)
       c.gen*coeffZ E.D (index S j k)) = f 1 := by
     simp only [f, map_add, map_mul, map_one, E.real_entry, IntermediateField.AdjoinSimple.algebraMap_gen]
     exact (S.row j k).symm.trans hd
-  have he := congrArg E.σ (f.injective hr)
-  simpa only [v, map_coeffZ, map_add, map_mul, map_one, AlgHom.coe_toRingHom, lam] using he
+  have he := congrArg E.σ.toRingHom (f.injective hr)
+  have gen : E.σ c.gen = E.σ.toRingHom c.gen := rfl
+  simpa only [v, map_coeffZ, map_add, map_mul, map_one, lam, gen] using he
 
 theorem map_rows {K L : Type*} [CommRing K] [CommRing L] (f : K →+* L) (a : K) (n : ℕ) :
     f (firstRow a n) = firstRow (f a) n ∧ f (secondRow a n) = secondRow (f a) n := by

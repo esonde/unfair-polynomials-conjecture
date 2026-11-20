@@ -1,5 +1,9 @@
-import Trinomial.Conjugate
-import Mathlib.Data.Int.LeastGreatest
+module
+
+public import Trinomial.Conjugate
+public import Mathlib.Data.Int.LeastGreatest
+
+@[expose] public section
 
 /-! # Lowest positive entries and drops (Section 1) -/
 
@@ -65,10 +69,10 @@ theorem exists_positive (c : FractionalCase) (l : ℤ) : ∃ i, 0 < c.entry i l 
   refine ⟨i-l/c.m*c.r, ?_⟩
   unfold entry at hi ⊢
   have he : (i-l/c.m*c.r)*c.m+l*c.r = i*c.m+(l%c.m)*c.r := by
-    linear_combination -(c.r : ℤ) * Int.emod_add_ediv l (c.m : ℤ)
+    linear_combination -(c.r : ℤ) * Int.emod_add_ediv_mul l (c.m : ℤ)
   rwa [he]
 
-private theorem exists_bottom (c : FractionalCase) (l : ℤ) :
+theorem exists_bottom (c : FractionalCase) (l : ℤ) :
     ∃ s, 0 < c.entry s l ∧ ∀ i, 0 < c.entry i l → s ≤ i := by
   apply Int.exists_least_of_bdd _ (c.exists_positive l)
   refine ⟨min 0 (-(l*c.r)), fun i hi => ?_⟩
@@ -82,13 +86,13 @@ private theorem exists_bottom (c : FractionalCase) (l : ℤ) :
     have hm : (1 : ℤ) ≤ c.m := by exact_mod_cast (show 1 ≤ c.m by linarith [c.oriented])
     nlinarith [mul_nonpos_of_nonpos_of_nonneg (le_of_not_ge h) (sub_nonneg.mpr hm)]
 
-def bottom (c : FractionalCase) (l : ℤ) := (c.exists_bottom l).choose
+def bottom (c : FractionalCase) (l : ℤ) := (exists_bottom c l).choose
 
 theorem bottom_pos (c : FractionalCase) (l : ℤ) : 0 < c.entry (c.bottom l) l :=
-  (c.exists_bottom l).choose_spec.1
+  (exists_bottom c l).choose_spec.1
 
 theorem bottom_le (c : FractionalCase) {i l : ℤ} (h : 0 < c.entry i l) : c.bottom l ≤ i :=
-  (c.exists_bottom l).choose_spec.2 i h
+  (exists_bottom c l).choose_spec.2 i h
 
 theorem below (c : FractionalCase) {i l : ℤ} (h : i < c.bottom l) : c.entry i l = 0 := by
   exact le_antisymm (not_lt.mp fun hp => (not_le_of_gt h) (c.bottom_le hp)) (c.entry_nonneg ..)
@@ -111,7 +115,7 @@ theorem bottom_period (c : FractionalCase) (l q : ℤ) :
 theorem word_binary (c : FractionalCase) {i l : ℤ} (hi : i < c.bottom (l-1)) :
     c.entry i l = 0 ∨ c.entry i l = 1 := by
   by_cases hs : c.bottom l ≤ i
-  · refine Int.le_induction (P := fun j => j < c.bottom (l-1) →
+  · refine Int.leInduction (motive := fun j _ => j < c.bottom (l-1) →
       c.entry j l = 0 ∨ c.entry j l = 1) ?_ ?_ i hs hi
     · intro hi
       have h := c.array (c.bottom l) l
@@ -128,7 +132,7 @@ theorem word_no_adjacent (c : FractionalCase) {i l : ℤ} (hi : i+1 < c.bottom (
     ¬(c.entry i l = 1 ∧ c.entry (i+1) l = 1) := by
   rintro ⟨h₀,h₁⟩
   have e := c.array (i+1) l
-  rw [add_sub_cancel_right,c.below hi,h₀,h₁,mul_zero,add_zero] at e
+  rw [add_sub_cancel_right,c.below hi,h₀,mul_zero,add_zero] at e
   rcases c.binary_digit (i+1) l with h|h <;> linarith
 
 theorem word_top_zero (c : FractionalCase) (l : ℤ) :

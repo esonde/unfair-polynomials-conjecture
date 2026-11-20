@@ -1,4 +1,8 @@
-import Uniform.Strips
+module
+
+public import Uniform.Strips
+
+@[expose] public section
 
 /-! # The forced four rows of a strip (Section 2) -/
 

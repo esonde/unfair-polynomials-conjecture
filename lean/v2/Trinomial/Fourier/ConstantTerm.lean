@@ -1,5 +1,9 @@
-import Trinomial.Fourier.Laurent
-import Mathlib.Data.Nat.Choose.Sum
+module
+
+public import Trinomial.Fourier.Laurent
+public import Mathlib.Data.Nat.Choose.Sum
+
+@[expose] public section
 
 /-! # Constant terms of even powers of T + T⁻¹ -/
 
@@ -10,11 +14,11 @@ open Polynomial
 open LaurentPolynomial (T)
 
 private theorem sum_coeff {ι : Type*} (s : Finset ι) (f : ι → Laurent) (d : ℤ) :
-    (∑ i ∈ s, f i) d = ∑ i ∈ s, f i d :=
-  map_sum (Finsupp.applyAddHom d : (ℤ →₀ ℝ) →+ ℝ) f s
+    (∑ i ∈ s, f i).coeff d = ∑ i ∈ s, (f i).coeff d := by
+  rw [AddMonoidAlgebra.coeff_sum, Finsupp.finsetSum_apply]
 
 theorem walk_count (n : ℕ) (d : ℤ) :
-    walk (X^n) d = ∑ i ∈ Finset.range (n+1),
+    (walk (X^n)).coeff d = ∑ i ∈ Finset.range (n+1),
       if (i : ℤ) - (n-i : ℕ) = d then ((n.choose i : ℕ) : ℝ) else 0 := by
   rw [map_pow,walk_X,J,add_pow,sum_coeff]
   apply Finset.sum_congr rfl
@@ -22,8 +26,8 @@ theorem walk_count (n : ℕ) (d : ℤ) :
   rw [LaurentPolynomial.T_pow,LaurentPolynomial.T_pow,← LaurentPolynomial.T_add]
   have shift : (i : ℤ)*1+↑(n-i)*(-1) = (i : ℤ)-↑(n-i) := by ring
   rw [shift]
-  change (T _ * LaurentPolynomial.C (n.choose i : ℝ) : Laurent) d = _
-  rw [mul_comm,← LaurentPolynomial.single_eq_C_mul_T,Finsupp.single_apply]
+  change (T _ * LaurentPolynomial.C (n.choose i : ℝ) : Laurent).coeff d = _
+  rw [mul_comm,← LaurentPolynomial.single_eq_C_mul_T,AddMonoidAlgebra.coeff_single_apply]
 
 theorem even_moment (n : ℕ) : moment (X^(2*n)) = (2*n).choose n := by
   rw [moment,walk_count,Finset.sum_eq_single n]

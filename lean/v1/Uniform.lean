@@ -1,1 +1,5 @@
-import Uniform.Probability
+module
+
+public import Uniform.Probability
+
+@[expose] public section

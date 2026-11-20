@@ -1,4 +1,8 @@
-import Trinomial.Fourier.Torus
+module
+
+public import Trinomial.Fourier.Torus
+
+@[expose] public section
 
 /-! # From the torus estimate to the filtered cofactor differences -/
 
@@ -19,7 +23,7 @@ private theorem pairing (lam : ℂ) (hR : 1 ≤ ‖lam‖) (h₂ : ‖lam‖ ≤
     funext (quotient_coefficient lam hR)
   let B (j i : Lattice) := a i*v (i+j)
   let A (j i : Lattice) := a (i-j)*v i
-  have sb (j : Lattice) : Summable (B j) := (ha.mul_right C).of_norm_bounded _ (fun i => by
+  have sb (j : Lattice) : Summable (B j) := (ha.mul_right C).of_norm_bounded (fun i => by
     simpa [B,norm_mul] using mul_le_mul_of_nonneg_left (hv (i+j)) (norm_nonneg (a i)))
   have eq (j i : Lattice) : A j ((Equiv.addRight j) i) = B j i := by simp [A,B]
   have sa (j : Lattice) : Summable (A j) := (Equiv.addRight j).summable_iff.mp (by

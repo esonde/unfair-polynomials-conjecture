@@ -1,6 +1,6 @@
 # Lean certificate for nonnegative trinomial factors
 
-The certificate formalizes [the v1 coefficient proof](../../paper/v1.tex) using Lean 4.19.0 and mathlib. The library entry point is `import Uniform`.
+The certificate formalizes [the v1 coefficient proof](../../paper/v1.tex) using Lean and mathlib. The library entry point is `import Uniform`.
 
 ## Build and check
 
@@ -9,7 +9,10 @@ With Elan installed, run these commands from this directory.
 ```sh
 lake exe cache get
 lake build
+lake comparator --config comparator.json
 ```
+
+[Challenge.lean](Challenge.lean) states the two results independently. [Solution.lean](Solution.lean) proves them using this development. [formalization.yaml](formalization.yaml) records their provenance.
 
 To inspect the public theorems and their transitive axiom dependencies, run the following in the same directory.
 

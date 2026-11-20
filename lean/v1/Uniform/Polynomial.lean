@@ -1,9 +1,13 @@
-import Mathlib.Algebra.Polynomial.UnitTrinomial
-import Mathlib.Algebra.Polynomial.Div
-import Mathlib.RingTheory.Polynomial.GaussLemma
-import Mathlib.Data.Real.Basic
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.Positivity
+module
+
+public import Mathlib.Algebra.Polynomial.UnitTrinomial
+public import Mathlib.Algebra.Polynomial.Div
+public import Mathlib.RingTheory.Polynomial.GaussLemma
+public import Mathlib.Basic.Real.Basic
+public import Mathlib.Tactic.Linarith
+public import Mathlib.Tactic.Positivity
+
+@[expose] public section
 
 /-! # Binary products and their factors (Section 1) -/
 

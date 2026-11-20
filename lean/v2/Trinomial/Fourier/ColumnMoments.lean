@@ -1,4 +1,8 @@
-import Trinomial.Fourier.TwoPoint
+module
+
+public import Trinomial.Fourier.TwoPoint
+
+@[expose] public section
 
 /-! # Lemma 5. The three column moments on either side of the switch -/
 
@@ -9,13 +13,13 @@ theorem outer_square {R u : ℝ} (j : ℕ) (hu : u ≠ 0) :
     raw R (.ofNat j) u ^2 = (u^2-R^2)^4/u^2*(R^2/u^2)^j := by
   have commutePow (b : ℝ) : (b^j)^2 = (b^2)^j := by rw [← pow_mul, mul_comm j 2, pow_mul]
   simp only [raw,base,ratioTerm,pow_succ u j,mul_pow,div_pow,commutePow,neg_sq]
-  field_simp; ring
+  field_simp <;> ring
 
 theorem inner_square {R u : ℝ} (j : ℕ) (hR : 0 < R) :
     raw R (.negSucc j) u ^2 = (u^2-R^2)^4/R^2*(u^2/R^2)^j := by
   have commutePow (b : ℝ) : (b^j)^2 = (b^2)^j := by rw [← pow_mul, mul_comm j 2, pow_mul]
   simp only [raw,base,ratioTerm,pow_succ R j,mul_pow,div_pow,commutePow,neg_sq]
-  field_simp; ring
+  field_simp <;> ring
 
 theorem outer_log {R u : ℝ} (j : ℕ) (hu : u ≠ 0) (hd : u^2-R^2 ≠ 0) :
     rawD R (.ofNat j) u = raw R (.ofNat j) u*(4*u/(u^2-R^2)-(j+1)/u) := by
@@ -26,10 +30,10 @@ theorem outer_log {R u : ℝ} (j : ℕ) (hu : u ≠ 0) (hd : u^2-R^2 ≠ 0) :
 theorem inner_log {R u : ℝ} (j : ℕ) (hu : u ≠ 0) (hd : u^2-R^2 ≠ 0) (hR : 0 < R) :
     rawD R (.negSucc j) u = raw R (.negSucc j) u*(4*u/(u^2-R^2)+j/u) := by
   cases j with
-  | zero => simp [raw,rawD,base,ratioTerm,slopeTerm]; field_simp; ring
+  | zero => simp [raw,rawD,base,ratioTerm,slopeTerm]; field_simp <;> ring
   | succ j =>
     simp only [raw,rawD,base,ratioTerm,slopeTerm,Nat.add_sub_cancel,Nat.cast_succ,pow_succ (-u)]
-    field_simp; ring
+    field_simp <;> ring
 
 def momentTerm (R u c₀ c₂ cD : ℝ) (j : ℕ) (s : ℤ) :=
   ell j * ((c₀ + c₂*(ell j^2-1/4))*g R s u^2 + cD*dg R s u^2)
@@ -58,7 +62,7 @@ private theorem at_origin {R : ℝ} (hp : 0 < R) (c₀ c₂ cD : ℝ) :
     simp [f,momentTerm,g,dg,cut,height,raw,rawD,ratioTerm,slopeTerm,pos,hn,hm,pos.le]
   have tot : f 0 + f 1 = momentTotal 0 (R^2) c₀ c₂ cD := by
     norm_num [f,momentTerm,g,dg,cut,height,raw,rawD,ratioTerm,slopeTerm,base,ell,momentTotal,M,pos,pos.le]
-    field_simp [hp.ne']; ring
+    field_simp [hp.ne'] <;> ring
   simpa only [Finset.sum_pair (by decide : (0:ℕ) ≠ 1),tot] using hasSum_sum_of_ne_finset_zero tail
 
 set_option maxHeartbeats 4200000 in
@@ -78,7 +82,7 @@ private theorem inner_moments {R u : ℝ} (hp : 0 < R) (hu : u ≠ 0) (hr : u^2 
     simp only [momentTerm,g,dg,cut,height,sub_pos,if_neg hr.asymm,if_pos hr,zero_pow (by decide : 2 ≠ 0),
       mul_zero,add_zero,zero_add]
     rw [inner_log j hu hd hp]
-    have lin : 4*u/(u^2-R^2)+j/u = A+B*ell j := by dsimp [A,B,h,x,ell]; field_simp; ring
+    have lin : 4*u/(u^2-R^2)+j/u = A+B*ell j := by dsimp [A,B,h,x,ell]; field_simp <;> ring
     rw [lin,mul_pow,inner_square j hp]
     ring
   · dsimp [h,x,A,B,geo1,geo2,geo3,momentTotal,M]
@@ -103,7 +107,7 @@ private theorem outer_moments {R u : ℝ} (hp : 0 < R) (hu : u ≠ 0) (hr : R^2 
     simp only [momentTerm,g,dg,cut,height,sub_pos,if_neg hr.asymm,if_pos hr,zero_pow (by decide : 2 ≠ 0),
       mul_zero,add_zero,zero_add]
     rw [outer_log j hu hd]
-    have lin : 4*u/(u^2-R^2)-(j+1)/u = A+B*ell j := by dsimp [A,B,h,x,ell]; field_simp; ring
+    have lin : 4*u/(u^2-R^2)-(j+1)/u = A+B*ell j := by dsimp [A,B,h,x,ell]; field_simp <;> ring
     rw [lin,mul_pow,outer_square j hu]
     ring
   · dsimp [h,x,A,B,geo1,geo2,geo3,momentTotal,M]
@@ -137,6 +141,9 @@ theorem column_moment_linear {R u : ℝ} (hp : 0 < R) (hd : u^2 ≠ R^2) (A B C 
       (momentTotal (u^2) (R^2) A B C) := by
   obtain ⟨h₀,h₂,hD⟩ := column_moments hp hd
   convert ((h₀.mul_left A).add (h₂.mul_left B)).add (hD.mul_left C) using 1
-  funext j; dsimp [momentTerm]; ring
+  · funext j
+    dsimp [momentTerm]
+    ring
+  · rfl
 
 end Trinomial.Fourier

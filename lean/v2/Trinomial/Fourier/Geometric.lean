@@ -1,8 +1,12 @@
-import Mathlib.Analysis.SpecificLimits.Normed
-import Mathlib.Data.Nat.Choose.Cast
-import Mathlib.Tactic.Linarith
-import Mathlib.Tactic.Ring
-import Mathlib.Tactic.FieldSimp
+module
+
+public import Mathlib.Analysis.SpecificLimits.Normed
+public import Mathlib.Data.Nat.Choose.Cast
+public import Mathlib.Tactic.Linarith
+public import Mathlib.Tactic.Ring
+public import Mathlib.Tactic.FieldSimp
+
+@[expose] public section
 
 /-! # Three weighted geometric sums used in the energy calculation -/
 
@@ -14,7 +18,7 @@ def ell (j : ℕ) : ℝ := j+1/2
 private theorem choose_three (j : ℕ) :
     ((j+3).choose 3 : ℝ) = ((j:ℝ)+3)*(j+2)*(j+1)/6 := by
   have h : ((j:ℝ)+3)*((j+2).choose 2 : ℝ) = ((j+3).choose 3 : ℝ)*3 := by
-    exact_mod_cast Nat.succ_mul_choose_eq (j+2) 2
+    exact_mod_cast Nat.add_one_mul_choose_eq (j+2) 2
   rw [Nat.cast_choose_two] at h
   push_cast at h
   linarith

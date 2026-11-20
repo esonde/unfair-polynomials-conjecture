@@ -1,5 +1,9 @@
-import Trinomial.Fourier.Energy
-import Mathlib.Data.Real.Pi.Bounds
+module
+
+public import Trinomial.Fourier.Energy
+public import Mathlib.Analysis.Real.Pi.Bounds
+
+@[expose] public section
 
 /-! # Absolute summability and the strict kernel norm bound -/
 

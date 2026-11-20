@@ -1,5 +1,9 @@
-import Trinomial.Fourier.Branches
-import Trinomial.Fourier.Geometric
+module
+
+public import Trinomial.Fourier.Branches
+public import Trinomial.Fourier.Geometric
+
+@[expose] public section
 
 /-! # The two-point geometric series used in Lemma 5 -/
 
@@ -39,7 +43,7 @@ theorem two_point {R u v : ℝ} (hp : 0 < R)
       have sg : (-1:ℝ)^(j*2) = 1 := by rw [Nat.mul_comm,pow_mul]; norm_num
       field_simp; ring_nf; rw [sg]; ring
     · dsimp [H,geo1]
-      rw [show 1-u*v/R^2 = (R^2-u*v)/R^2 by field_simp]
+      rw [show 1-u*v/R^2 = (R^2-u*v)/R^2 by rw [sub_div, div_self (pow_ne_zero _ hp.ne')]]
       field_simp [hp.ne',hd,show u*v-R^2 ≠ 0 by intro e; apply hd; linarith]; ring
   · have h : R^2 < |u*v| := by rw [abs_mul,sq]; exact mul_lt_mul hu hv.le hp (abs_nonneg _)
     have hn : u*v ≠ 0 := by intro eq; simp [eq] at h; linarith [sq_nonneg R]
@@ -56,8 +60,10 @@ theorem two_point {R u v : ℝ} (hp : 0 < R)
       have sg : (-1:ℝ)^(j*2) = 1 := by rw [Nat.mul_comm,pow_mul]; norm_num
       field_simp [hu0,hv0]; ring_nf; rw [sg]; ring
     · dsimp [H,geo1]
-      rw [show 1-R^2/(u*v) = (u*v-R^2)/(u*v) by field_simp]
-      field_simp [hn,hd]; ring
+      rw [show 1-R^2/(u*v) = (u*v-R^2)/(u*v) by rw [sub_div, div_self hn]]
+      have hu0 := (mul_ne_zero_iff.mp hn).1
+      have hv0 := (mul_ne_zero_iff.mp hn).2
+      field_simp [hn,hd,hu0,hv0] <;> ring
 
 theorem diagonal_moment {R u : ℝ} (hp : 0 < R) (hn : u^2 ≠ R^2) :
     HasSum (fun j => ell j * (g R (.ofNat j) u^2 + g R (.negSucc j) u^2)) (M (u^2) (R^2)) := by
@@ -67,6 +73,6 @@ theorem diagonal_moment {R u : ℝ} (hp : 0 < R) (hn : u^2 ≠ R^2) :
   simp only [← sq] at s
   convert s using 1
   unfold M H base
-  field_simp [sub_ne_zero.mpr hn]; ring
+  field_simp [sub_ne_zero.mpr hn] <;> ring
 
 end Trinomial.Fourier

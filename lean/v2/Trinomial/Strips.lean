@@ -1,4 +1,8 @@
-import Trinomial.Columns
+module
+
+public import Trinomial.Columns
+
+@[expose] public section
 
 /-! # Existence and size of a widest strip -/
 
@@ -6,7 +10,7 @@ namespace Trinomial.FractionalCase
 
 theorem bottom_antitone (c : FractionalCase) : Antitone c.bottom := by
   intro i j hij
-  exact Int.le_induction (P := fun n => c.bottom n ≤ c.bottom i) le_rfl
+  exact Int.leInduction (motive := fun n _ => c.bottom n ≤ c.bottom i) le_rfl
     (fun n _ ih => (c.bottom_step n).trans ih) j hij
 
 private theorem plateau_lt_period (c : FractionalCase) {l : ℤ} {n : ℕ}

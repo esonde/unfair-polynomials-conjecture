@@ -1,4 +1,8 @@
-import Trinomial.Trinomial
+module
+
+public import Trinomial.Trinomial
+
+@[expose] public section
 
 /-! # Uniformity of finitely supported mass functions on the integers
 
@@ -57,20 +61,27 @@ private theorem polynomial_laws {A B : ℝ[X]} (ha : NonnegativeCoeffs A) (hb : 
   exact ⟨(part_binary A na).mp h.1, (part_binary B nb).mp h.2⟩
 
 private theorem translated (P : ℝ[X]) (s n : ℤ) :
-    (P.toLaurent * T s : LaurentPolynomial ℝ) n = coeffZ P (n-s) := by
-  rw [LaurentPolynomial.T,AddMonoidAlgebra.mul_single_apply,mul_one,Polynomial.toLaurent_apply]
+    (P.toLaurent * T s : LaurentPolynomial ℝ).coeff n = coeffZ P (n-s) := by
+  rw [LaurentPolynomial.T,AddMonoidAlgebra.coeff_mul_single_apply,mul_one,LaurentPolynomial.coeff_toLaurent]
+  rw [← sub_eq_add_neg]
   generalize n-s = d
   cases d with
-  | ofNat i => exact Finsupp.mapDomain_apply Int.ofNat_injective P.toFinsupp i
+  | ofNat i =>
+    simpa [coeffZ, Polynomial.toFinsupp_apply] using
+      Finsupp.mapDomain_apply_of_injective
+        (Nat.castEmbedding : ℕ ↪ ℤ).injective P.toFinsupp.coeff i
   | negSucc i =>
     rw [coeffZ_of_neg _ (by omega)]
-    exact Finsupp.mapDomain_notin_range _ _ (by rintro ⟨k,hk⟩; omega)
+    exact Finsupp.mapDomain_notin_range _ _ (by
+      rintro ⟨k, hk⟩
+      change (k : ℤ) = Int.negSucc i at hk
+      omega)
 
 private theorem translated_flat (P : ℝ[X]) (s : ℤ) :
-    UniformOnSupport (P.toLaurent*T s : LaurentPolynomial ℝ) ↔ UniformOnSupport P.coeff := by
+    UniformOnSupport (P.toLaurent*T s : LaurentPolynomial ℝ).coeff ↔ UniformOnSupport P.coeff := by
   constructor
   · intro h i j hi hj
-    have H (n : ℕ) : (P.toLaurent*T s : LaurentPolynomial ℝ) ((n:ℤ)+s) = P.coeff n := by simp [translated]
+    have H (n : ℕ) : (P.toLaurent*T s : LaurentPolynomial ℝ).coeff ((n:ℤ)+s) = P.coeff n := by simp [translated]
     exact H i ▸ H j ▸ h _ _ ((H i).trans_ne hi) ((H j).trans_ne hj)
   · intro h i j hi hj
     rw [translated] at hi hj ⊢
@@ -83,8 +94,8 @@ private theorem translated_flat (P : ℝ[X]) (s : ℤ) :
     simpa [hi.1,hj.1] using h _ _ hi.2 hj.2
 
 private theorem translated_count (P : ℝ[X]) (s : ℤ) :
-    (P.toLaurent*T s).support.card = P.support.card := by
-  have eq : (P.toLaurent*T s).support = P.support.map (Nat.castEmbedding.trans (Equiv.addRight s).toEmbedding) := by
+    (P.toLaurent*T s).coeff.support.card = P.support.card := by
+  have eq : (P.toLaurent*T s).coeff.support = P.support.map (Nat.castEmbedding.trans (Equiv.addRight s).toEmbedding) := by
     ext z
     simp only [Finsupp.mem_support_iff,translated,Finset.mem_map,Function.Embedding.trans_apply,
       Equiv.coe_toEmbedding,Nat.castEmbedding_apply,Polynomial.mem_support_iff]
@@ -102,13 +113,13 @@ private theorem translated_count (P : ℝ[X]) (s : ℤ) :
 
 /-- Convolution form for arbitrary nonzero finite mass functions on ℤ. -/
 theorem uniform_factors_of_convolution (a b : AddMonoidAlgebra ℝ ℤ)
-    (ha : ∀ i, 0 ≤ a i) (hb : ∀ i, 0 ≤ b i) (nb : b ≠ 0)
-    (count : a.support.card = 3) (flat : UniformOnSupport (a*b)) :
-    UniformOnSupport a ∧ UniformOnSupport b := by
-  induction a using LaurentPolynomial.induction_on_mul_T with | Qf =>
-    induction b using LaurentPolynomial.induction_on_mul_T with | Qf =>
+    (ha : ∀ i, 0 ≤ a.coeff i) (hb : ∀ i, 0 ≤ b.coeff i) (nb : b ≠ 0)
+    (count : a.coeff.support.card = 3) (flat : UniformOnSupport (a*b).coeff) :
+    UniformOnSupport a.coeff ∧ UniformOnSupport b.coeff := by
+  induction a using LaurentPolynomial.induction_on_mul_T with | mul_T =>
+    induction b using LaurentPolynomial.induction_on_mul_T with | mul_T =>
       rename_i A s B t
-      have idx (p : ℝ[X]) (u : ℤ) (n : ℕ) : (p.toLaurent*T u : LaurentPolynomial ℝ) ((n:ℤ)+u) = p.coeff n := by simp [translated]
+      have idx (p : ℝ[X]) (u : ℤ) (n : ℕ) : (p.toLaurent*T u : LaurentPolynomial ℝ).coeff ((n:ℤ)+u) = p.coeff n := by simp [translated]
       have product : A.toLaurent*T (-(s:ℤ))*(B.toLaurent*T (-(t:ℤ))) =
           (A*B).toLaurent*T (-(s:ℤ)-t) := by rw [map_mul,sub_eq_add_neg,LaurentPolynomial.T_add]; ring
       rw [product,translated_flat] at flat

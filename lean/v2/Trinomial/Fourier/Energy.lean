@@ -1,6 +1,10 @@
-import Trinomial.Fourier.Angular
-import Trinomial.Fourier.IntegrationByParts
-import Trinomial.Fourier.Weights
+module
+
+public import Trinomial.Fourier.Angular
+public import Trinomial.Fourier.IntegrationByParts
+public import Trinomial.Fourier.Weights
+
+@[expose] public section
 
 /-! # Angular energy and the six constant terms in Proposition 4 -/
 

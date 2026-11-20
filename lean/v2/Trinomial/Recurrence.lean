@@ -1,4 +1,8 @@
-import Trinomial.Polynomial
+module
+
+public import Trinomial.Polynomial
+
+@[expose] public section
 
 /-! # The coefficient recurrence at integer indices -/
 

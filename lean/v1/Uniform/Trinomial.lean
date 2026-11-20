@@ -1,5 +1,9 @@
-import Uniform.Comparison
-import Uniform.Walks.Convolution
+module
+
+public import Uniform.Comparison
+public import Uniform.Walks.Convolution
+
+@[expose] public section
 
 /-! # Nonnegative trinomial factors of binary polynomials -/
 

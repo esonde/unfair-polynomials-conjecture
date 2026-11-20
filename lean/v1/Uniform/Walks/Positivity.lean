@@ -1,6 +1,10 @@
-import Uniform.Walks.Polynomial
-import Mathlib.Analysis.Complex.Polynomial.Basic
-import Mathlib.Tactic.ComputeDegree
+module
+
+public import Uniform.Walks.Polynomial
+public import Mathlib.Analysis.Complex.Polynomial.Basic
+public import Mathlib.Tactic.ComputeDegree
+
+@[expose] public section
 
 /-! # Positivity of the walk functional on the interval [-2,2] -/
 
@@ -24,7 +28,7 @@ private theorem Squares.mul {p q : Laurent} (hp : Squares p) (hq : Squares q) : 
       convert Squares.term (h*g) using 1
       rw [map_mul]; ring
 
-private theorem Squares.coeff_zero {p : Laurent} (hp : Squares p) : 0 ≤ p 0 := by
+private theorem Squares.coeff_zero {p : Laurent} (hp : Squares p) : 0 ≤ p.coeff 0 := by
   induction hp with
   | term h => rw [← sum_squares]; exact tsum_nonneg (fun i => sq_nonneg _)
   | add _ _ ih ih' => exact add_nonneg ih ih'

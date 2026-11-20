@@ -1,5 +1,9 @@
-import Uniform.Walks.Pointwise
-import Uniform.Walks.Weights
+module
+
+public import Uniform.Walks.Pointwise
+public import Uniform.Walks.Weights
+
+@[expose] public section
 
 /-! # The global weighted energy of the walk kernel -/
 
@@ -80,7 +84,7 @@ private theorem column_bound (R : ℝ) (hR : 0 < R) (s : ℤ) (ds : Finset ℤ) 
   have ident : localMap R hR s = restrict (C a) *
       (restrict (C (a^2+9))*f^2 + (4-restrict X^2)*g^2) := by
     ext u
-    simp [localMap,onI,localEnergy,restrict_apply,f,column,g,a,w,show (4 : Functions) u = 4 from rfl]
+    simp [localMap,onI_apply,localEnergy,restrict_apply,f,column,g,a,w,show (4 : Functions) u = 4 from rfl]
   rw [ident, L, b_const_mul,b_add,b_const_mul]
   change _ ≤ a*((a^2+9)*L (f^2)+L ((4-restrict X^2)*g^2))
   apply le_trans _ (mul_le_mul_of_nonneg_left (add_le_add
@@ -139,7 +143,7 @@ theorem energy_bound (R : ℝ) (hR : 1 ≤ R) (n : ℕ) (ds : Finset ℤ) :
   have cmp : L (∑ j ∈ range n, F j) ≤ L (restrict (density (X^2) (C (R^2)))) := by
     apply L_mono
     intro u
-    simpa [F,ContinuousMap.sum_apply,localMap,onI,restrict_apply,density,Polynomial.algebraMap_eq]
+    simpa [F,ContinuousMap.sum_apply,localMap,onI_apply,restrict_apply,density,Polynomial.algebraMap_eq]
       using partial_density R hp n u.property
   apply cmp.trans
   rw [L_restrict,density_moment]

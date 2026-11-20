@@ -1,5 +1,9 @@
-import Trinomial.Fourier.Branches
-import Trinomial.Fourier.ColumnMoments
+module
+
+public import Trinomial.Fourier.Branches
+public import Trinomial.Fourier.ColumnMoments
+
+@[expose] public section
 
 /-! # Angular profiles, their half-integer weights and their parity -/
 
@@ -19,23 +23,27 @@ def signAt : ℤ → ℝ
 
 theorem reflected_branch (R : ℝ) (s : ℤ) (u : ℝ) :
     branch R s (-u) = signAt s * branch R s u := by
-  cases s with
-  | ofNat j =>
-    simp only [branch,g,cut,height,neg_sq,signAt]
-    split_ifs
-    · simp only [raw,base,ratioTerm,neg_sq,w]
-      rw [show (-u)^(j+1) = (-1)^(j+1)*u^(j+1) by rw [← mul_pow,neg_one_mul],div_mul_eq_div_div]
-      have h : ((-1:ℝ)^(j+1))⁻¹ = (-1:ℝ)^(j+1) := by rw [← inv_pow]; norm_num
-      simp only [div_eq_mul_inv,h]; ring
-    · ring
-  | negSucc j =>
-    simp only [branch,g,cut,height,neg_sq,signAt]
-    split_ifs
-    · simp only [raw,base,ratioTerm,neg_sq,w]
-      rw [show (-u)^j = (-1)^j*u^j by rw [← mul_pow,neg_one_mul]]
-      rw [neg_neg]
-      have hs : ((-1:ℝ)^j)^2 = 1 := by rw [sq,← mul_pow]; norm_num
-      linear_combination -((4-u^2) * (u^2-R^2)^2 * u^j/R^(j+1)) * hs
-    · ring
+  have height_even : height R s (-u) = height R s u := by
+    cases s <;> simp [height]
+  have w_even : w (-u) = w u := by simp [w]
+  unfold branch g cut
+  rw [height_even, w_even]
+  by_cases h : 0 < height R s u
+  · rw [if_pos h, if_pos h]
+    cases s with
+    | ofNat j =>
+      simp only [raw, base, ratioTerm, neg_sq, signAt]
+      rw [neg_pow u (j+1), div_mul_eq_div_div]
+      have inv_sign : ((-1 : ℝ)^(j+1))⁻¹ = (-1)^(j+1) := by
+        rw [← inv_pow]
+        norm_num
+      simp only [div_eq_mul_inv, inv_sign]
+      ring
+    | negSucc j =>
+      simp only [raw, base, ratioTerm, neg_sq, neg_neg, signAt]
+      rw [neg_pow]
+      have hs : ((-1 : ℝ)^j)^2 = 1 := by rw [sq, ← mul_pow]; norm_num
+      linear_combination -(w u * (u^2-R^2)^2 * u^j/R^(j+1)) * hs
+  · simp [h]
 
 end Trinomial.Fourier
